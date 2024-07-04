@@ -2,8 +2,25 @@ const loader = document.querySelector(".loader");
 const cardsRow = document.querySelector(".cards .row");
 const paginationList = document.querySelector(".pagination");
 const cards = document.querySelectorAll('.card');
-let modalCloseBtn=document.querySelector(".modal1-close");
-let modal=document.querySelector(".modal1")
+let modalCloseBtn = document.querySelector(".modal1-close");
+let modal = document.querySelector(".modal1");
+let modal1Content = document.querySelector('.modal1-content');
+let modal12 = document.querySelector(".modal1-1");
+
+
+function createModal(img, title, id) {
+    return `
+         <div class="modal1">
+        <div class="modal1-content">
+            <button class="modal1-close">X</button>
+            <img src="${img}" alt="${id}">
+            <h2>${title}</h2>
+            <p>${id}</p>
+        </div>
+    </div>
+
+    `
+}
 
 function createCards(data) {
     return `
@@ -35,10 +52,20 @@ function pageBtnCreate(num) {
     `
 }
 
-
-
-
-
+function showModal(cards) {
+    cards.length > 0 && cards.forEach(card => {
+        card.addEventListener('click', (event) => {
+            modal12.style.display="block";
+            let cardImgSrc = card.children[0].getAttribute("src");
+            let cardTitle = card.children[1].children[0].innerHTML;
+            let cardText = card.children[1].children[1].innerHTML
+            let modal = createModal(cardImgSrc, cardTitle, cardText);
+            modal12.innerHTML = modal
+        })
+    })
+    return;
+}
+  
 document.addEventListener("DOMContentLoaded", () => {
     fetch("https://cars-pagination.onrender.com/all-countries")
         .then((response) => {
@@ -67,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.log(a.target.innerHTML);
                     startId = (txt - 1) * 9
                     endId = startId + 9
-                    cardsRow.innerHTML=""
+                    cardsRow.innerHTML = ""
                     createCardSort(startId, endId, data);
                 })
             })
@@ -75,16 +102,17 @@ document.addEventListener("DOMContentLoaded", () => {
             createCardSort(startId, endId, data)
 
             const cards = document.querySelectorAll('.card');
-            cards.length > 0 && cards.forEach(card => {
-                card.addEventListener('click', (event) => {
-                    let cardImgSrc=card.children[0].getAttribute("src");
-                    let cardTitle=card.children[1].children[0].innerHTML;
-                    let cardText=card.children[1].children[1].innerHTML
-                    console.log(card.children[0].getAttribute("src"));
 
-                })
-            })
+            showModal(cards);
         })
         .catch(error => console.log(error))
 })
+
+document.addEventListener("keydown", (event)=>{
+    if(event.key=='Escape'){
+        modal12.style.display="none"
+    }
+})
+
+
 
