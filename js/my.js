@@ -1,10 +1,11 @@
-const loader=document.querySelector(".loader");
-const cardsRow=document.querySelector(".cards .row");
-const paginationList=document.querySelector(".pagination");
-const cards=document.querySelectorAll('.card');
-const modal=document.querySelector(".modal");
+const loader = document.querySelector(".loader");
+const cardsRow = document.querySelector(".cards .row");
+const paginationList = document.querySelector(".pagination");
+const cards = document.querySelectorAll('.card');
+let modalCloseBtn=document.querySelector(".modal1-close");
+let modal=document.querySelector(".modal1")
 
-function createCards(data){
+function createCards(data) {
     return `
          <div class="col-12 col-sm-6 col-md-4">
             <div class="card">
@@ -19,7 +20,16 @@ function createCards(data){
     `;
 }
 
-function pageBtnCreate(num){
+function createCardSort(a, b, data) {
+    for (let i = a; i < b; i++) {
+        let card = createCards(data[i]);
+        // cardsRow.innerHTML="";
+        cardsRow.innerHTML += card;
+    }
+    return;
+}
+
+function pageBtnCreate(num) {
     return `
          <li class="page-item"><a class="page-link" href="#">${num}</a></li>
     `
@@ -27,42 +37,54 @@ function pageBtnCreate(num){
 
 
 
-document.addEventListener("DOMContentLoaded", ()=>{
+
+
+document.addEventListener("DOMContentLoaded", () => {
     fetch("https://cars-pagination.onrender.com/all-countries")
-    .then((response)=>{
-        if(response.status==200){
-            return response.json();
-        }
-    })
-    .then(data=>{
-        let count=data.length;
-        if(count>0){
-           loader.classList.add("hide")
-        }
-        let pageBtns=Math.ceil(count/9);
-        console.log(pageBtns);
-        for(let i=1; i<=pageBtns; i++){
-            let btn=pageBtnCreate(i);            paginationList.innerHTML+=btn;
-             
-        }
-        
-
-    
-        let startId=0;let endId=8;
-        for(let i=startId; i<=endId; i++){
-            let card=createCards(data[i]);
-            cardsRow.innerHTML+=card;
-        }
-
-    const cards=document.querySelectorAll('.card');
-    cards.length > 0 && cards.forEach(card=>{
-        card.addEventListener('click', (event)=>{
-            console.log(event);
-        
+        .then((response) => {
+            if (response.status == 200) {
+                return response.json();
+            }
         })
-    })
+        .then(data => {
+            let count = data.length;
+            if (count > 0) {
+                loader.classList.add("hide")
+            }
+            let pageBtns = Math.ceil(count / 9);
+            for (let i = 1; i <= pageBtns; i++) {
+                let btn = pageBtnCreate(i); paginationList.innerHTML += btn;
+            }
 
+            let startId = 0; let endId = 9;
 
-    })
-    .catch(error=>console.log(error))
+            let pageBtn = document.querySelectorAll(".page-item")
+            pageBtn.forEach(pageBtn => {
+                let pageNum = pageBtn.childNodes[0].innerHTML;
+                pageBtn.addEventListener('click', (a) => {
+                    let txt = a.target.innerHTML
+                    txt *= 1;
+                    console.log(a.target.innerHTML);
+                    startId = (txt - 1) * 9
+                    endId = startId + 9
+                    cardsRow.innerHTML=""
+                    createCardSort(startId, endId, data);
+                })
+            })
+
+            createCardSort(startId, endId, data)
+
+            const cards = document.querySelectorAll('.card');
+            cards.length > 0 && cards.forEach(card => {
+                card.addEventListener('click', (event) => {
+                    let cardImgSrc=card.children[0].getAttribute("src");
+                    let cardTitle=card.children[1].children[0].innerHTML;
+                    let cardText=card.children[1].children[1].innerHTML
+                    console.log(card.children[0].getAttribute("src"));
+
+                })
+            })
+        })
+        .catch(error => console.log(error))
 })
+
